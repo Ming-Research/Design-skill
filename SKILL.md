@@ -121,7 +121,10 @@ headings included.
 
 Do one task on one pull request, from a Draft to its finish, and keep every
 change that serves the task on it; open another only for a change that stands
-on its own. Finish a task before starting the next:
+on its own. On resuming, check the actual worktree and pull request state
+first. Push coherent progress as you go and keep the description and its
+validation results current. When a conclusion or its grounds change, update
+the guidance and work that depend on it in the same change. Finish a task before starting the next:
 
 1. Validate the work with the project's checks.
 2. Run one review: a separate, read-only agent that did not implement the
@@ -326,7 +329,9 @@ in the same change. A compiler limitation, a timeout or an unimplemented
 feature never rewrites an expected result.
 
 Size a run before starting it: run the smallest useful sample, time it, look
-at its spread, then choose the scale.
+at its spread, then choose the scale; repeat or lengthen only where the spread
+is too large to decide. Record a discriminating experiment's criterion before
+using its result to choose.
 
 ### Design judgment
 
@@ -335,7 +340,10 @@ the effort of changing existing code, tests, programs or documents, and how
 many of them a choice touches, is no reason for or against it; work a design
 needs only because of a poor abstraction is a flaw of that design. How often
 something appears in a project's own tests and programs is no evidence of how
-often real programs need it.
+often real programs need it. Nor is the effort of building a mechanism soundly
+a reason to choose or refuse it; the rule governs which design is chosen, not
+which work comes first. Record a choice's reasons when it settles, not by
+reconstruction at completion.
 
 ### Repository hygiene
 
@@ -345,13 +353,19 @@ often real programs need it.
   serves, its home and when it will be removed. A script ships wired to a
   caller or is deleted after its one use; a document is kept current or
   deleted.
-- Prefer native tooling to a new script.
+- Prefer native tooling; a new script states why the native path cannot do
+  the job.
 - Supersede in place: when new material replaces old, update, merge or delete
   the old in the same change.
 - Preserve unrelated changes in a dirty worktree; change only what the task
   covers.
+- Each document holds what serves its reader: one owner states a definition
+  and others point to it, and a cited passage supports the claim citing it.
+  A pull request description describes its change and is never a source of
+  project rules.
 - Describe work in precise, neutral technical wording: the concrete rule,
-  failure and expected behavior.
+  failure and expected behavior, with material risks reported accurately and
+  without security or attack framing for ordinary correctness work.
 
 ### Machines
 
