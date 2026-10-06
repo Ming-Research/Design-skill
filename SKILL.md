@@ -164,13 +164,25 @@ structure. The main line holds only decisions the owner approved; a draft
 branch changes the tree freely, and the owner's approval, recorded in the
 log, lets it become ready. Git holds history.
 
-The project's AGENTS.md maps these roles to its paths:
+### Layout
 
-- Live tree: one file per node, with children in a directory of the same name.
-- Change log: one entry per approved change, newest first.
-- Research record: where derivations, measurements and comparisons live.
-- Maintained TODO: where deferred work is recorded.
-- Form check and readiness check: the lint invocations below.
+- `design/` at the repository root holds the tree and nothing else of the
+  project.
+- Live trees: every root node file `design/<concept>.md` other than `log.md`
+  is one tree; a node's children live in the directory of the same name,
+  `design/<concept>/`, to any depth.
+- Change log: `design/log.md`, one entry per approved change, newest first.
+- Checker: the [Design-skill](https://github.com/Ming-Research/Design-skill)
+  submodule at `design/skill`, which the project never edits; a change is
+  made in Design-skill and adopted by moving the pin, naming the revision and
+  why.
+- Checks: `make design-lint` checks form on every push, as part of the
+  project's static checks; `make design-ready` is the readiness check, run
+  before marking a pull request ready and in CI on ready pull requests and
+  on the main line. Both run `lint.py` over every live tree.
+- The project's AGENTS.md names its research record (where derivations,
+  measurements and comparisons live), its maintained TODO (where deferred
+  work is recorded) and anything its readiness check adds.
 
 ### Node format
 
@@ -295,11 +307,9 @@ only when the deferral contradicts the scope or the completion claim.
 
 ### Lint
 
-`lint.py`, from the Design-skill submodule the project names, checks form, not
-design quality. Its layout has one root node file and optional child directory
-per concept, with `log.md` beside the roots.
+`design/skill/lint.py` checks form, not design quality.
 
-    python3 -B <skill-directory>/lint.py --root <design-directory> --trees <concept> ... [--base <base>] [--require-approval]
+    python3 -B design/skill/lint.py --root design --trees <every live tree> [--base <base>] [--require-approval]
 
 Without `--base` it checks form only. With `--base` it also prints node count,
 depth and decision counts against the base, which the review reports. With
@@ -308,8 +318,9 @@ base, the newest log entry must be new, name every changed node and carry a
 nonempty `Owner-approved:`, which lint cannot authenticate; the owner reads
 the log before merging. A `--base` resolves to a commit that exposes the
 changes under review: for a push to the main line, the revision before the
-push. In CI, `sh <skill-directory>/review-base.sh EVENT REF PUSH_BEFORE`
-prints that base.
+push. In CI, `sh design/skill/review-base.sh EVENT REF PUSH_BEFORE` prints
+that base. `make design-lint` also runs the checker's own tests,
+`python3 -B -m unittest discover -s design/skill -p 'test_lint.py'`.
 
 ## 4. Engineering standards
 
