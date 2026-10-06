@@ -1,0 +1,14 @@
+name: test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test the lint and the CI base selection
+        run: python3 -B -m unittest discover -s design-tree -p 'test_lint.py' -v
