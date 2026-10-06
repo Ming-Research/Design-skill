@@ -70,7 +70,7 @@ Summary: Layout lengths become 1/64-pixel integers; the measurements are in
 research/investigations/vocabulary/DESIGN.md.
 ```
 
-[`design-tree/SKILL.md`](design-tree/SKILL.md) is the full procedure: the
+[`SKILL.md`](SKILL.md) is the full procedure: the
 node format, what counts as a decision, how the owner's decisions are
 gathered into decision cards at handoff, the log format and the review
 checks.
@@ -79,20 +79,29 @@ checks.
 
 | File | Purpose |
 |---|---|
-| `design-tree/SKILL.md` | The skill, loaded by the agent when a task matches its description |
-| `design-tree/lint.py` | Form check of a tree and, with `--require-approval`, the readiness check |
-| `design-tree/review-base.sh` | Picks the base revision a CI job compares the tree with |
-| `design-tree/test_lint.py` | Tests for the two scripts above |
+| `SKILL.md` | The skill, loaded by the agent when a task matches its description |
+| `lint.py` | Form check of a tree and, with `--require-approval`, the readiness check |
+| `review-base.sh` | Picks the base revision a CI job compares the tree with |
+| `test_lint.py` | Tests for the two scripts above |
 
 The scripts need Python 3, Git and a POSIX shell.
 
 ## Using it in a project
 
-A project keeps its own copy of `design-tree/`, which it does not edit:
-changes are made here, so every project runs the same skill.
+A project adds this repository as a Git submodule, which pins the commit it
+uses. The skill is changed only here, and a project adopts a change by moving
+its pin.
 
-1. **Copy it** into the project, for example as `design/skill/`, and name
-   the Design-skill commit it came from in the commit message.
+1. **Add the submodule**, for example at `design/skill`:
+
+   ```sh
+   git submodule add https://github.com/Ming-Research/Design-skill.git design/skill
+   ```
+
+   A fresh clone then needs `git clone --recurse-submodules`, or
+   `git submodule update --init` afterwards, and CI checks out submodules
+   (`submodules: true` in `actions/checkout`). Until the submodule is
+   initialized, the agents do not see the skill.
 
 2. **Expose it to the agents.** From the project's root, link it where Claude
    Code and Codex look for skills:
@@ -133,9 +142,14 @@ changes are made here, so every project runs the same skill.
 
 ## Changing the skill
 
-Change it here, by pull request, with the tests passing. Then copy the merged
-revision into each project in that project's own pull request, which names
-the Design-skill commit it adopts.
+Change it here, by pull request, with the tests passing. A project then
+moves its submodule to the merged commit in its own pull request, which names
+the Design-skill revision it adopts and why:
+
+```sh
+git -C design/skill fetch origin && git -C design/skill checkout <commit>
+git add design/skill
+```
 
 ## Projects using it
 
