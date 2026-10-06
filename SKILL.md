@@ -8,8 +8,10 @@ them; projects load those instructions directly, not this skill. -->
 
 # Owner-wide agent instructions
 
-A project's own AGENTS.md adds its paths, checks, review checklist and the
-extra parts its reports carry.
+A project's own AGENTS.md holds only what is specific to that project: its
+goal and priorities, references, paths, checks, review checklist, merge rules,
+project-only rules and the extra parts its reports carry. It leaves out what
+these instructions say and what holds for a night or a week.
 
 ## 1. Working with the owner
 
@@ -73,7 +75,9 @@ Stop and wait for the owner only for an action that:
 - cannot be undone;
 - reaches outside the repository's work branch, such as publishing, posting or
   messaging;
-- belongs to the owner, such as an approval or a merge into the main line; or
+- belongs to the owner, such as an approval or a merge into the main line;
+- uses one of the owner's machines directly, such as the 14900K over the home
+  network; or
 - rests on an uncertainty that could change the direction of the work.
 
 ### Ledger
@@ -108,7 +112,8 @@ action needs. Order cards oldest first, each after the cards it depends on.
 
 ### Language
 
-Write repository artifacts in the language the project requires. Talk with
+Write repository artifacts in English unless the project requires another
+language. Talk with
 the owner in the owner's language, and write reports and cards in it,
 headings included.
 
@@ -302,3 +307,61 @@ the log before merging. A `--base` resolves to a commit that exposes the
 changes under review: for a push to the main line, the revision before the
 push. In CI, `sh <skill-directory>/review-base.sh EVENT REF PUSH_BEFORE`
 prints that base.
+
+## 4. Engineering standards
+
+### Evidence
+
+A passing result is evidence only if a wrong result would have failed it.
+Prefer an observation that separates two hypotheses over one merely
+consistent with yours, make each new check fail once for each way it can
+fail, never check a transform against its own output, and read an exit code
+directly, not through a pipe. Resolve every commit id, path, count and
+measurement with a tool when you write it. Another agent's or a reviewer's
+report is a lead to verify, not evidence.
+
+A green result reached by weakening a requirement answers nothing. Keep every
+test and check wired; retire one only on purpose, with its technical reason
+in the same change. A compiler limitation, a timeout or an unimplemented
+feature never rewrites an expected result.
+
+Size a run before starting it: run the smallest useful sample, time it, look
+at its spread, then choose the scale.
+
+### Design judgment
+
+Judge a design by its merits. Until a project has real compatibility needs,
+the effort of changing existing code, tests, programs or documents, and how
+many of them a choice touches, is no reason for or against it; work a design
+needs only because of a poor abstraction is a flaw of that design. How often
+something appears in a project's own tests and programs is no evidence of how
+often real programs need it.
+
+### Repository hygiene
+
+- Add a repository-root entry only with the owner's approval; put new material
+  in the directory that owns its kind, and ask when none fits.
+- Create a file, directory, script or document only when you can name what it
+  serves, its home and when it will be removed. A script ships wired to a
+  caller or is deleted after its one use; a document is kept current or
+  deleted.
+- Prefer native tooling to a new script.
+- Supersede in place: when new material replaces old, update, merge or delete
+  the old in the same change.
+- Preserve unrelated changes in a dirty worktree; change only what the task
+  covers.
+- Describe work in precise, neutral technical wording: the concrete rule,
+  failure and expected behavior.
+
+### Machines
+
+Build and test on GitHub-hosted CI, keeping the owner's computer free: push
+the work branch and read its runs, adding a temporary workflow on the branch
+when no existing one runs what you need, and removing it before the branch is
+ready. Run locally only checks that compile nothing, or what CI cannot do,
+and say so in the report.
+
+The owner's i9-14900K is a self-hosted CI runner (labels `self-hosted`,
+`14900k`): use it through CI for heavy test runs and for every precise timing
+or performance measurement. Several projects share it, so check that it is
+idle and tell the other sessions before a long run.
