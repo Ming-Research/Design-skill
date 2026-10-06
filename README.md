@@ -72,14 +72,16 @@ research/investigations/vocabulary/DESIGN.md.
 
 [`SKILL.md`](SKILL.md) is the full procedure: the
 node format, what counts as a decision, how the owner's decisions are
-gathered into decision cards at handoff, the log format and the review
-checks.
+gathered into decision cards in reports, the log format and the review
+checks. It is kept as a copy of the owner's agent instructions, which the
+owner's agents load at every session start instead of waiting for the skill
+to be triggered.
 
 ## Contents
 
 | File | Purpose |
 |---|---|
-| `SKILL.md` | The skill, loaded by the agent when a task matches its description |
+| `SKILL.md` | The procedure, as a skill; a copy of the owner's agent instructions |
 | `lint.py` | Form check of a tree and, with `--require-approval`, the readiness check |
 | `review-base.sh` | Picks the base revision a CI job compares the tree with |
 | `test_lint.py` | Tests for the two scripts above |
@@ -103,8 +105,9 @@ its pin.
    (`submodules: true` in `actions/checkout`). Until the submodule is
    initialized, the agents do not see the skill.
 
-2. **Expose it to the agents.** From the project's root, link it where Claude
-   Code and Codex look for skills:
+2. **Expose it to the agents**, unless they already load the procedure as
+   standing instructions. From the project's root, link it where Claude Code
+   and Codex look for skills:
 
    ```sh
    mkdir -p .claude/skills .agents/skills

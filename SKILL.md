@@ -1,46 +1,190 @@
 ---
 name: design-tree
-description: Keep a project's design decisions in a design tree, bring every decision that needs the owner to the owner, and review an implementation against the recorded decisions. Use when a task makes or changes a choice between viable alternatives, edits the design tree or its log, asks the owner to decide anything, hands finished work back to the owner, or reviews design and implementation for correspondence (DCR). Not for implementing a recorded decision unchanged or for a routine fix.
+description: "The owner's working rules for agents: reports to an owner who reads only the last message, when to stop, the ledger of items awaiting the owner and decision cards, one task per pull request with one completion review, and a design tree of the decisions a project is built on, checked against the code (design and correspondence checks G1-G3, DC1-DC4). Use when a task asks the owner to decide anything, reports to the owner, edits a design tree or its log, or reviews design and implementation for correspondence."
 ---
 
-# Design tree
+<!-- Backup copy of the owner-wide agent instructions, kept in step with
+them; projects load those instructions directly, not this skill. -->
+
+# Owner-wide agent instructions
+
+A project's own AGENTS.md adds its paths, checks, review checklist and the
+extra parts its reports carry.
+
+## 1. Working with the owner
+
+### How the owner reads
+
+The owner reads the last report on returning, often many turns later, and
+skips the work in between, so the report carries everything the owner needs.
+
+### While working
+
+Between tool calls, write at most one short status line. Record anything
+important you learn, such as a finding, a surprise, a changed plan or a
+question for the owner, where you will find it again (your memory, a notes
+file, the project's TODO), and carry it into the next report.
+
+### Reports
+
+Write a report whenever you stop, finished or blocked, and whenever the owner
+sends "report" while you work; after a "report" request, continue working. In
+a discussion, talk normally.
+
+Keep a report short enough to read in two minutes; length buries what
+matters. The owner knows the projects, their components and their
+established terms, so explain only what is new since the owner last read:
+names you introduced, internal plan labels, new mechanisms. State each fact
+once, and leave step-by-step detail to the pull request description.
+
+A report covers the time since the owner's last message, in this order:
+
+1. **Progress.** The whole goal in one line, then a list of what is done,
+   with the items finished since the owner's last message in bold, and a list
+   of what remains.
+2. **This round.** What you did since the owner's last message and what each
+   change does. Mention a mistake you caught and fixed, or a routine merge
+   conflict, only when it affects the results.
+3. **Results.** What now works, the evidence for it, and what is still
+   unverified.
+4. **Why stopped.** When you stopped before finishing, the reason.
+5. **Open items.** Every ledger ID with its status, then a decision card for
+   each item that needs the owner's ruling, or one line saying none does.
+6. **At completion,** also: the validation run and its revision, the review's
+   scope and the findings it fixed, what the work found along the way with
+   each item's disposition, and the parts the project's AGENTS.md adds.
+
+Make the report stand alone: give each thing its full name, and restate in
+the report any earlier context the reader needs.
+
+### When to stop and wait
+
+Before starting, discuss every choice that sets the direction of the work, and
+keep discussing while a matter that could change it substantially is unclear.
+
+Once started, work through to completion. When a question arises, add it to
+the ledger with your recommendation, proceed on that recommendation, and bring
+it to the owner in the report. When an item blocks one line of work, finish
+every other line first; stop when only work that depends on the owner
+remains.
+
+Stop and wait for the owner only for an action that:
+
+- cannot be undone;
+- reaches outside the repository's work branch, such as publishing, posting or
+  messaging;
+- belongs to the owner, such as an approval or a merge into the main line; or
+- rests on an uncertainty that could change the direction of the work.
+
+### Ledger
+
+Every item awaiting the owner gets an ID, `Q1`, `Q2` and on, kept for that
+item for the whole conversation; an item enters the ledger with the next
+unused number. Refer to an item by its ID, with any internal label such as a
+plan step after it. The ledger holds design decisions and operational
+authorizations alike, including a direction the owner gave in passing. An
+item stays open until the owner answers its ID; superseding or withdrawing
+one takes the owner's agreement, asked in one line with the reason under open
+items. Reports list every ID with its status, for example "Q1, Q2 approved;
+Q3 approved with a change; Q4 open".
+
+### Decision cards
+
+A card is for an item with a real choice between options. Put a horizontal
+rule (`---`) before and after each card. A card opens with
+its ID and the question in bold, then:
+
+- **Background.** The problem, limited to what the decision turns on, for a
+  reader who has not seen the work: what the component or rule does, what
+  goes wrong or stays open, and the concrete evidence. Include a minimal code or command example whenever it makes the
+  problem concrete.
+- **Options.** A, B and on. Each states what it does, its cost and risks, and
+  why it is or is not recommended; mark the recommended one.
+- **Confidence N/5.** 5 when evidence settles it, 1 when it rests on
+  judgment, with the reason and what could overturn it.
+
+A card for an operational authorization uses the same parts at the length the
+action needs. Order cards oldest first, each after the cards it depends on.
+
+### Language
+
+Write repository artifacts in the language the project requires. Talk with
+the owner in the owner's language, and write reports and cards in it,
+headings included.
+
+## 2. Pull requests and completion
+
+Do one task on one pull request, from a Draft to its finish, and keep every
+change that serves the task on it; open another only for a change that stands
+on its own. Finish a task before starting the next:
+
+1. Validate the work with the project's checks.
+2. Run one review: a separate, read-only agent that did not implement the
+   change applies the review checks of part 3 together with the project's
+   review checklist, and reports its scope, revision, findings with evidence,
+   and uncertainty. The project names the model and checklist. A review
+   approves nothing.
+3. Fix every finding; a fix that changes a decision becomes a ledger item.
+   Send a fix back for review, limited to what it touched, when it changed a
+   decision or rewrote logic or behavior beyond a local repair; check smaller
+   fixes yourself and list them in the report.
+4. Push, confirm the remote head is the reviewed revision, bring the pull
+   request description current, and write the report.
+5. After the owner rules on every open card, write the approval records the
+   project keeps, mark the pull request ready once its checks pass, and leave
+   the merge to the project's merge rules.
+
+Examine the responsibilities, interfaces, representations and affected
+consumers of the work for design gaps and clear opportunities for a better
+design, even when the current design is valid. Likewise, when you notice a
+defect outside the task, such as a bug, an awkward interface, duplicated
+logic, an oversized file or function, or a stale document or test, fix it in
+the same change when it is small and inside the files you are changing;
+otherwise record it in the project's TODO with its impact, uncertainty, the
+change you would make, how to validate it and when to reopen it. List each in
+the report and the pull request with its disposition (fixed, deferred or
+declined) and reason.
+
+## 3. Design tree
+
+Apply this part when the repository root contains `design/`; skip it
+otherwise.
 
 A design tree records the decisions a project is built on: what was chosen,
-because of what, instead of what. It is organized by concept, not by code
-structure. The project's main line holds only decisions the owner approved;
-a draft branch may change the tree freely, and the owner's approval, recorded
-in the log, is what lets that branch become ready. Git holds history; the log
-records the approvals.
+because of what, instead of what, organized by concept rather than code
+structure. The main line holds only decisions the owner approved; a draft
+branch changes the tree freely, and the owner's approval, recorded in the
+log, lets it become ready. Git holds history.
 
-The project maps these roles to its own paths:
+The project's AGENTS.md maps these roles to its paths:
 
 - Live tree: one file per node, with children in a directory of the same name.
 - Change log: one entry per approved change, newest first.
 - Research record: where derivations, measurements and comparisons live.
 - Maintained TODO: where deferred work is recorded.
-- Form check and readiness check: the `lint.py` invocations below.
+- Form check and readiness check: the lint invocations below.
 
-## Node format
+### Node format
 
 A node is a file named for the decision it owns, holding one or more
-`Decision:` lines and an optional `Rejected:` list, without dates, standalone
-facts, measurements, or progress. Cite evidence in a reason instead. Name
-events by what happened, not by date. Each field occupies one line, with a
+`Decision:` lines and an optional `Rejected:` list. It holds decisions only;
+cite dates, standalone facts, measurements and progress as evidence in a
+reason, and name events by what happened. Each field occupies one line, with a
 blank line between fields; list items directly follow their header.
 
 A `Decision:` line states the choice, its reason after `because`, and the
-alternative after `instead of`. At least one must be present; a line with
-neither is a description, not a decision. Write for a reader who has not
-seen the source record, expanding compressed terminology.
+alternative after `instead of`; at least one of the two is present. Write for
+a reader who has not seen the source record, expanding compressed
+terminology.
 
 `Rejected:` lists refused alternatives as `- <alternative>: rejected because
-<reason>`, one per line. Give a discriminating reason, and do not re-propose
-an alternative without explaining what changed.
+<reason>`, one per line, each with a discriminating reason. Re-propose a
+rejected alternative only with an account of what changed.
 
-## What is a decision
+### What is a decision
 
 A choice between viable alternatives is a decision, even when the selection
-seems obvious. An implementation step with only one viable way needs no
+seems obvious; an implementation step with only one viable way needs no
 record. Start coarse; the owner tunes the threshold when the tree grows too
 fine or too thin.
 
@@ -50,179 +194,79 @@ under which conditions; a provisional choice names its reason, uncertainty
 and reopening condition. A constitutional principle or one measurement shows
 that a choice fits, not that it is the only possible one. Keep an open
 question open: name an assumption used to proceed and how it will be checked,
-and never record a proposal or an agent's default as a settled decision.
+and keep a proposal or an agent's default as a ledger item until the owner
+settles it.
 
-## Keeping the tree lean
+### Keeping the tree lean
 
 Apply three filters to every tree change:
 
-1. Decision, not description. Remove `Decision:` lines without `because` or
+1. Decision, not description: every `Decision:` line has `because` or
    `instead of`.
-2. Not derivable from code. Remove nodes that only restate an interface or
-   implementation.
-3. Normalize upward. State a shared rule once at its common ancestor instead
-   of repeating it in children.
+2. Not derivable from code: a node states a choice, not an interface or
+   implementation the code already shows.
+3. Normalize upward: state a shared rule once at its common ancestor.
 
-Keep each decision concise: retain the choice, its decisive reason or refused
+Keep each decision concise: the choice, its decisive reason or refused
 alternative (or both), and the qualifications needed to preserve its meaning.
 Put detailed derivations, measurements, comparisons and implementation
-mechanics in the relevant research record and link directly to that section.
-A long `Decision:` line is still a long explanation. The tree must explain the
-choice without requiring the reader to open the link; the linked record
-supplies the supporting detail.
+mechanics in the research record and link directly to that section; the tree
+explains the choice on its own.
 
-## Changes and approval
+### Changes and approval
 
-On a draft branch, change the live tree directly, in the same work as the
-implementation it governs, and keep the two consistent as the work goes.
-Writing a decision does not approve it. The owner approves at the end, when
-the finished work is handed back (Workflow step 4), and approves only the
-decisions shown.
+On a draft branch, change the live tree in the same work as the
+implementation it governs, and keep the two consistent as the work goes. The
+owner approves the decisions shown in the completion report; writing one does
+not approve it. The owner's ruling becomes the node's `Decision:`, and each
+refused option worth remembering a `Rejected:` item with the reasons its card
+gave. When the owner refuses a change, revise or revert it. A change made
+after approval, other than one the owner directed, is shown and approved
+again.
 
-After the owner has ruled on every decision of the branch that needs a
-ruling, write one log entry for the approved change and only then mark the
-branch ready. The readiness check fails while the tree differs from the base
-without such an entry, so unapproved changes cannot reach the main line. A
-change made after approval, other than one the owner directed, is shown and
-approved again. When the owner refuses a change, revise or revert it; keep a
-refused alternative worth remembering as a `Rejected:` item. Approval of the
-tree does not authorize a merge; the project's merge rules decide that.
+A report lists tree edits that change no decision, such as a rewording, under
+its open items: the node, what changed and why, one bullet each.
 
-## Log format
+### Log format
 
-Each entry has a `## <date> <title>` heading, a `Nodes:` line listing every
-node added, changed or retired, an `Owner-approved:` line identifying the
-owner's approval of the handoff in the owner's words, and a concise `Summary:`
-paragraph with the change and its reasons. That approval covers every node
-the entry names: those in its cards and those in its other tree edits. Write the entry only
-after that approval; the field records it and never requests or infers it.
-The newest entry must be new on the branch and name every changed node. Cite
-data and evidence at their source in the research record instead of
-reproducing them. When parallel branches add entries, keep both, newest
-first.
+After the owner has ruled on every decision of the branch, write one log
+entry: a `## <date> <title>` heading, a `Nodes:` line listing every node
+added, changed or retired, an `Owner-approved:` line identifying the owner's
+approval in the owner's words, and a concise `Summary:` paragraph with the
+change and its reasons. The approval covers every node the entry names. The
+newest entry is new on the branch and names every changed node. Cite data and
+evidence at their source in the research record. When parallel branches add
+entries, keep both, newest first.
 
-## Owner decisions
+### Review checks
 
-The owner decides in the conversation, in the owner's language. A decision
-the owner makes lands in the tree, as a node added, changed or retired or as
-a refused option under `Rejected:`, so every decision awaiting the owner is
-a tree change, and all of them form one ledger kept in the conversation.
-An entry may come from a choice made while working, a review finding, an open
-research question or a direction the owner gave in passing. The scope of the
-work is agreed before starting (below); a change to it is reported in the
-handoff's status, not as an entry.
+The completion review applies these to the tree diff, the complete work diff
+and the relevant existing nodes and ancestors, including for a task without
+tree changes.
 
-- **Entries.** Each gets an ID, `Q1`, `Q2` and on, never renumbered or reused.
-  It stays open until the owner answers that ID. A discussion that moves past
-  an entry leaves it open; superseding or withdrawing one needs the owner's
-  agreement too.
-- **Restate.** After every owner reply, list every ID with its status, for
-  example "Q1, Q2 approved; Q3 approved with a change; Q4, Q5 not yet
-  discussed". When the owner states a direction in passing, say which entry
-  it became and whether it is taken as a ruling.
-- **Before starting.** Discuss every choice that sets the direction of the
-  work. While a matter that could change it substantially is unclear, keep
-  discussing; do not start.
-- **After starting.** Work through to completion. A question that arises is
-  sent to the owner with a recommendation and work continues on that
-  recommendation; the entry stays open and returns at handoff.
-- **Batch.** Bring every open entry to the owner once, at handoff: review
-  findings go only there, and a question sent while working returns there.
-  Never bring rulings one round at a time.
-- Re-read this skill before a handoff; a copy loaded early in a long session
-  may predate a change to it.
-
-A handoff presents, in this order:
-
-1. **Status.** For each thing the owner asked for: done, done on a
-   recommendation still open (name the ID), changed from the agreed scope
-   (how and why), or not started. Research that recommends work is not that
-   work.
-2. **Decision cards.** One per open decision the branch adds, changes or
-   retires, oldest first, each after the cards it depends on; a card is that
-   decision's tree change. A decision the owner already ruled on needs no
-   card; the restated ledger shows it approved. End with one line naming
-   every open ID and stating that no other decision is open. A card opens
-   with its ID and the question in bold, then three parts:
-   - Problem: the problem itself, for a reader who has not seen the work:
-     what the component or rule does, what goes wrong or stays open, and the
-     concrete evidence. Explain each project term at first use.
-   - Options: A, B and on, the recommended one marked. Each says what it
-     does and what it costs, then why it is recommended or why not.
-   - Confidence N/5: 5 when evidence settles it, 1 when it rests on judgment,
-     with the reason and what could overturn it.
-
-   The tree records the ruling: the chosen option becomes the node's
-   `Decision:` and each refused option worth remembering a `Rejected:` item,
-   with the reasons the card gave.
-3. **Other tree edits.** A node edit that changes no decision, such as a
-   rewording, needs no card but is listed here: the node, what changed and
-   why, one bullet each. Write "none" when there is none.
-4. The parts the project adds, such as its other approved artifacts, the
-   validation run, the review's scope and the findings it fixed, and what the
-   work found along the way. They cite a card by its ID instead of repeating
-   its reasons.
-
-Write each part as bullets under its bold name; a table's narrow columns bury
-reasoning.
-
-## Workflow
-
-1. Settle the direction with the owner (Owner decisions).
-2. Implement, change the tree and validate on a draft pull request. Examine
-   responsibilities, interfaces, representations and affected consumers for
-   design gaps and clear opportunities for a better design, even when the
-   current design is valid. Fix in-scope gaps and selected improvements;
-   record deferred ones in the maintained TODO with impact, uncertainty,
-   validation criterion and reopening condition, proportional to the work.
-   List each in the pull request with its disposition (fixed, deferred or
-   declined) and reason, so the owner sees it.
-3. At completion, run DCR once, or the project's review that includes it.
-   Fix every finding, including those that change the tree or another
-   approved artifact; a fix that changes a decision becomes a ledger entry,
-   and one that changes the agreed scope goes into the handoff's status.
-   Review again only a fix that became a ledger entry or rewrote logic or
-   behavior beyond a local repair, and only what it touched; recheck other
-   fixes yourself and list them at handoff.
-4. Hand off (Owner decisions). The owner rules on every open card.
-5. Write the log entry, mark ready once the readiness check and the project's
-   CI pass, and leave the merge to the project's merge rules.
-
-## Design Correspondence Review (DCR)
-
-A separate, read-only reviewer that did not implement the change, normally a
-small or mid-sized model with bounded inputs, reads the actual artifacts and
-reports scope, revision, findings, evidence and uncertainty. It applies the
-design checks G1–G3 and the correspondence checks DC1–DC4 below to the tree
-diff, the complete work diff and the relevant existing nodes and ancestors.
-A task without tree changes still gets DCR at completion. DCR approves
-nothing.
-
-### Design checks
+Design checks:
 
 G1. Decision test. Check each added or changed node against the node format
-and leanness filters. Report descriptions without decisions, circular refusal
-reasons, and choices or grounds that require the source record to understand.
+and leanness filters. Report descriptions without decisions, circular
+refusal reasons, and choices or grounds that require the source record to
+understand.
 
 G2. Consistency scan. Check changed nodes against ancestors and siblings,
-extending to related decisions as needed. A change governing a whole concept
-requires reading its subtree. Report nodes read and conflicts, narrowings, or
+extending to related decisions as needed; a change governing a whole concept
+requires reading its subtree. Report nodes read and conflicts, narrowings or
 broken dependencies, naming both sides.
 
-G3. Architectural fit. Check that structural choices received the Workflow
-assessment when made or revised, and that the result is visible to the owner.
-Report concrete gaps or clear improvement opportunities left without an
-assessment or disposition, including deferred opportunities or their
-validation missing from the maintained TODO. Do not demand speculative
-generality or reconstruct a missing rationale after coding.
+G3. Architectural fit. Check that structural choices received the design-gap
+examination of part 2 and that the result is visible to the owner. Report
+concrete gaps or clear improvement opportunities left without a
+disposition, including deferred ones missing from the TODO. Judge the
+design as built; leave speculative generality and reconstructed rationale
+out.
 
-### Correspondence: design and implementation
-
-Inputs: the agreed delivery scope, its design commitments including relevant
-existing nodes and ancestors, the complete work diff, resulting artifacts, and
-validation. Here, code means whichever artifact implements a decision,
-including a specification or configuration. Extend into affected consumers as
-needed.
+Correspondence checks, on the agreed scope, its design commitments, the work
+diff, resulting artifacts and validation. Code means whichever artifact
+implements a decision, including a specification or configuration; extend
+into affected consumers as needed.
 
 DC1. Decisions in code. For each changed region embodying a design choice,
 name its node. Report a choice with no node as a missing tree change;
@@ -237,29 +281,24 @@ and rejected approaches still implemented.
 
 DC4. Missing or partial implementation. For each design commitment in scope,
 identify support for its required behavior and conditions. Report missing or
-partial paths, placeholders, and insufficient evidence; a related function
-alone is not proof of completion. Exclude unrelated or explicitly deferred
-designs unless the deferral contradicts the agreed scope or completion claim.
+partial paths, placeholders and insufficient evidence; a related function
+alone is not proof of completion. An explicitly deferred design is in scope
+only when the deferral contradicts the scope or the completion claim.
 
-## Lint
+### Lint
 
-`lint.py` checks form, not design quality. Its layout has one root node file
-and optional child directory per concept, with `log.md` beside the roots.
+`lint.py`, from the Design-skill submodule the project names, checks form, not
+design quality. Its layout has one root node file and optional child directory
+per concept, with `log.md` beside the roots.
 
     python3 -B <skill-directory>/lint.py --root <design-directory> --trees <concept> ... [--base <base>] [--require-approval]
 
 Without `--base` it checks form only. With `--base` it also prints node count,
-depth and decision counts against the base, which a tree review reports. With
+depth and decision counts against the base, which the review reports. With
 `--require-approval` it is the readiness check: when the tree differs from the
 base, the newest log entry must be new, name every changed node and carry a
-nonempty `Owner-approved:`. The field is an assertion that lint cannot
-authenticate; the owner reads the log before merging. A `--base` must resolve
-to a commit, and a caller must choose one that exposes the changes under
-review: for a push to the main line, the revision before the push. In CI,
-`sh <skill-directory>/review-base.sh EVENT REF PUSH_BEFORE` prints that base.
-
-## Translation: run on request
-
-Render the requested tree diff or subtree in the requested language, keeping
-node names, paths, and code identifiers untranslated. Do not store the
-translation in the repository; the tree is English only.
+nonempty `Owner-approved:`, which lint cannot authenticate; the owner reads
+the log before merging. A `--base` resolves to a commit that exposes the
+changes under review: for a push to the main line, the revision before the
+push. In CI, `sh <skill-directory>/review-base.sh EVENT REF PUSH_BEFORE`
+prints that base.
