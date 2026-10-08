@@ -13,6 +13,22 @@ what is specific to that project and lasts: its goal and first priorities,
 references, paths, checks and gate commands, review checklist, extra merge
 preconditions, project-only rules and the extra parts its reports carry.
 
+## Why projects written in Whitefoot exist
+
+Every project written in Whitefoot currently serves two goals:
+
+1. to find what the Whitefoot language and compiler lack, and to complete
+   them; and
+2. to show with real projects that Whitefoot's safety holds and its
+   performance competes.
+
+A working project is the means to these goals, never a goal of its own, and
+its own goal and priorities apply within them. When Whitefoot refuses, or
+compiles poorly, a form a writer would naturally write, stop and examine it:
+whether it is a real gap, and how the language or compiler should change to
+close it. Bring that to the owner as a decision; never route around it with
+another spelling, a run-time check or any workaround that hides the gap.
+
 ## 1. Working with the owner
 
 ### How the owner reads
@@ -36,13 +52,19 @@ a discussion, talk normally.
 A report covers the time since the owner's last message and is short enough
 to read in two minutes. The owner knows the projects, their components and
 their established terms, so explain only what is new in that time: names you
-introduced, internal plan labels, new mechanisms. Each fact appears in one
-section; step-by-step detail belongs in the pull request description. The
-sections, in order:
+introduced, internal plan labels, new mechanisms. The owner does not keep
+identifiers in mind: every ledger ID, plan step, pull request or issue number
+comes with a few words saying what it is, and commit hashes, CI run IDs and
+file paths appear only where the owner needs them to act. Finish every
+statement: after a fact, say what it means for the goal or for the owner.
+Each fact appears in one section; step-by-step detail belongs in the pull
+request description. The sections, in order:
 
-1. **Progress.** The whole goal in one line, then the done items by name, with
-   those finished since the owner's last message in bold, and the remaining
-   items by name.
+1. **Progress.** The whole goal in one line, stated as what will be true when
+   it is done. Then the done items and the remaining items, each named in
+   plain words by what it delivers, such as "firn answers SCAN", with its
+   pull request or ledger ID after the words; the items finished since the
+   owner's last message are in bold.
 2. **This round.** What each change since the owner's last message does.
    Mention a mistake you caught and fixed, or a routine merge conflict, only
    when it affects the results.
@@ -77,7 +99,9 @@ Stop and wait for the owner only for an action that:
 - publishes, posts or sends something to people, or merges into a main line;
 - belongs to the owner, such as an approval;
 - uses another of the owner's machines other than through CI, such as the
-  14900K over the home network; or
+  14900K over the home network;
+- would route around a Whitefoot gap instead of closing it (see why projects
+  written in Whitefoot exist); or
 - rests on an uncertainty that could change the direction of the work.
 
 Standing authorizations: pushing to a work branch, opening and updating its
