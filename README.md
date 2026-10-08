@@ -70,18 +70,15 @@ Summary: Layout lengths become 1/64-pixel integers; the measurements are in
 research/investigations/vocabulary/DESIGN.md.
 ```
 
-[`SKILL.md`](SKILL.md) is the full procedure: the
-node format, what counts as a decision, how the owner's decisions are
-gathered into decision cards in reports, the log format and the review
-checks. It is kept as a copy of the owner's agent instructions, which the
-owner's agents load at every session start instead of waiting for the skill
-to be triggered.
+The full procedure (the node format, what counts as a decision, how the
+owner's decisions are gathered into decision cards in reports, the log format
+and the review checks) lives in the owner's agent instructions, which the
+agents load at every session start; this repository holds its checker.
 
 ## Contents
 
 | File | Purpose |
 |---|---|
-| `SKILL.md` | The procedure, as a skill; a copy of the owner's agent instructions |
 | `lint.py` | Form check of a tree and, with `--require-approval`, the readiness check |
 | `review-base.sh` | Picks the base revision a CI job compares the tree with |
 | `test_lint.py` | Tests for the two scripts above |
@@ -103,23 +100,13 @@ its pin.
    A fresh clone then needs `git clone --recurse-submodules`, or
    `git submodule update --init` afterwards, and CI checks out submodules
    (`submodules: true` in `actions/checkout`). Until the submodule is
-   initialized, the agents do not see the skill.
+   initialized, the checks cannot run.
 
-2. **Expose it to the agents**, unless they already load the procedure as
-   standing instructions. From the project's root, link it where Claude Code
-   and Codex look for skills:
-
-   ```sh
-   mkdir -p .claude/skills .agents/skills
-   ln -s ../../design/skill .claude/skills/design-tree
-   ln -s ../../design/skill .agents/skills/design-tree
-   ```
-
-3. **Map its roles** in the project's agent instructions (`AGENTS.md` or
+2. **Map its roles** in the project's agent instructions (`AGENTS.md` or
    `CLAUDE.md`): where the live tree and the log live, where research records
    and deferred work go, and which commands run the checks.
 
-4. **Wire the checks**, for example in a Makefile:
+3. **Wire the checks**, for example in a Makefile:
 
    ```make
    DESIGN_REVIEW_BASE ?= origin/main
