@@ -40,7 +40,7 @@ else
     echo "design review target origin/$target is missing; fetch it (fetch-depth: 0)" >&2
     exit 1
   fi
-  candidate=$(git merge-base "origin/$target" HEAD)
+  candidate=$(git merge-base "refs/remotes/origin/$target" HEAD)
 fi
 
 if ! base=$(git rev-parse --verify --end-of-options "${candidate}^{commit}"); then

@@ -251,8 +251,12 @@ Summary: Record the stacked change.
     def test_stacked_pull_request_still_needs_its_own_log_entry(self):
         parent = self.stacked_pull_request(logged=False)
         result = self.ci_base("pull_request", "refs/pull/2/merge", target="parent")
+        self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout.strip(), parent)
-        self.assertNotEqual(self.lint(result.stdout.strip(), require_approval=True).returncode, 0)
+        self.assert_rejected(
+            self.lint(result.stdout.strip(), require_approval=True),
+            "the newest log entry is not new",
+        )
 
     def test_pull_request_with_a_missing_target_fails(self):
         self.assert_rejected(
