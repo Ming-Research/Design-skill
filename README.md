@@ -126,7 +126,10 @@ its pin.
    make design-ready DESIGN_REVIEW_BASE="$base"
    ```
 
-   where `PUSH_BEFORE` is `${{ github.event.before }}`. A draft branch may
+   where `PUSH_BEFORE` is `${{ github.event.before }}`. A pull request is
+   compared with its fork point from the branch it targets, which the script
+   reads from `GITHUB_BASE_REF`, so a pull request stacked on another work
+   branch answers only for its own tree changes. A draft branch may
    change the tree without an approval; `design-ready` is what keeps
    unapproved changes off the main line.
 

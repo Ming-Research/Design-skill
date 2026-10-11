@@ -5,6 +5,7 @@ These fixtures are maintained with the checked tools; replace them when those
 tools are replaced. No fixture edits a live tree.
 """
 from pathlib import Path
+import os
 import subprocess
 import sys
 import tempfile
@@ -83,10 +84,13 @@ Nodes: {nodes}
             cwd=self.root, text=True, capture_output=True,
         )
 
-    def ci_base(self, event, ref, before=""):
+    def ci_base(self, event, ref, before="", target=None):
+        env = {k: v for k, v in os.environ.items() if k != "GITHUB_BASE_REF"}
+        if target is not None:
+            env["GITHUB_BASE_REF"] = target
         return subprocess.run(
             ["sh", str(CI_BASE), event, ref, before],
-            cwd=self.root, text=True, capture_output=True,
+            cwd=self.root, text=True, capture_output=True, env=env,
         )
 
     def assert_rejected(self, result, diagnostic):
@@ -213,6 +217,52 @@ Nodes: {nodes}
         result = self.ci_base("pull_request", "refs/pull/1/merge")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout.strip(), self.base)
+
+    def stacked_pull_request(self, logged):
+        self.change_tree()
+        self.log_change()
+        parent = self.commit("Parent branch edit, approved and logged")
+        self.git("update-ref", "refs/remotes/origin/parent", parent)
+        self.write("design/language/stacked.md", DECISION)
+        if logged:
+            log = (self.root / "design/log.md").read_text(encoding="ascii")
+            self.write("design/log.md", log.replace("# Design tree change log\n\n", """# Design tree change log
+
+## 2026-01-03 Stacked fixture
+
+Nodes: language/stacked
+
+Owner-approved: Fixture owner approved the stacked revision.
+
+Summary: Record the stacked change.
+
+""", 1))
+        self.commit("Stacked branch edit")
+        return parent
+
+    def test_stacked_pull_request_uses_the_merge_base_of_its_target(self):
+        parent = self.stacked_pull_request(logged=True)
+        result = self.ci_base("pull_request", "refs/pull/2/merge", target="parent")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout.strip(), parent)
+        ready = self.lint(result.stdout.strip(), require_approval=True)
+        self.assertEqual(ready.returncode, 0, ready.stderr)
+
+    def test_stacked_pull_request_still_needs_its_own_log_entry(self):
+        parent = self.stacked_pull_request(logged=False)
+        result = self.ci_base("pull_request", "refs/pull/2/merge", target="parent")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout.strip(), parent)
+        self.assert_rejected(
+            self.lint(result.stdout.strip(), require_approval=True),
+            "tree changed since base but the change log did not",
+        )
+
+    def test_pull_request_with_a_missing_target_fails(self):
+        self.assert_rejected(
+            self.ci_base("pull_request", "refs/pull/2/merge", target="absent"),
+            "origin/absent is missing",
+        )
 
     def test_unhandled_event_fails(self):
         self.assert_rejected(self.ci_base("unknown-event", "refs/heads/main"), "unsupported")
