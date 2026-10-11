@@ -255,7 +255,7 @@ Summary: Record the stacked change.
         self.assertEqual(result.stdout.strip(), parent)
         self.assert_rejected(
             self.lint(result.stdout.strip(), require_approval=True),
-            "the newest log entry is not new",
+            "tree changed since base but the change log did not",
         )
 
     def test_pull_request_with_a_missing_target_fails(self):
