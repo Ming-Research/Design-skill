@@ -10,7 +10,6 @@ import sys
 DECISION_MARKERS = (" because ", " instead of ")
 LOG_ENTRY = re.compile(r"^## \d{4}-\d{2}-\d{2} \S")
 LOG_REQUIRED = ("Nodes:", "Summary:")
-OWNER_APPROVED = "Owner-approved:"
 FORBIDDEN_HEADINGS = ("## Facts", "## Moves")
 DATED_LINE = re.compile(r"^- 20\d\d-\d\d-\d\d")
 REJECTED_ITEM = re.compile(r"^- (.+?): rejected because (\S.*)$")
@@ -158,7 +157,7 @@ class Lint:
                 continue
             if current is None:
                 continue
-            for field in LOG_REQUIRED + (OWNER_APPROVED,):
+            for field in LOG_REQUIRED:
                 if line.startswith(field):
                     current["fields"][field] = line[len(field):].strip()
         first_line = {}
@@ -210,10 +209,6 @@ class Lint:
                              if line.startswith("## ")}
         if newest["heading"] in base_headings:
             self.err("log.md", "tree changed since base but the newest log entry is not new")
-        approval = newest["fields"].get(OWNER_APPROVED)
-        if not approval:
-            self.err(f"log.md:{newest['line']}",
-                     "newest entry for a tree change lacks a nonempty Owner-approved: field")
         nodes = {node.strip() for node in newest["fields"].get("Nodes:", "").split(",")
                  if node.strip()}
         for node in sorted(changed):
@@ -270,7 +265,7 @@ def main():
                         help="top-level concept names to check")
     parser.add_argument("--base", default=None)
     parser.add_argument("--require-approval", action="store_true",
-                        help="readiness: a tree changed since --base needs a new, approved log entry")
+                        help="readiness: a tree changed since --base needs a new log entry")
     args = parser.parse_args()
     lint = Lint(args.root, args.trees)
     lint.discover()

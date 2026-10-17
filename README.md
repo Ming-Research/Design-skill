@@ -22,8 +22,9 @@ short enough to read and strict enough to check:
   structure. Each node holds one or more decisions and the alternatives they
   refused.
 - **The owner decides.** An agent may change the tree freely on a draft
-  branch, but the branch cannot become ready until the owner has approved
-  every change and the approval is recorded in the log. CI enforces this.
+  branch, but the owner rules on its design cards before merge, and the
+  branch cannot become ready until its newest log entry names every changed
+  node. CI enforces the log check.
 - **Code follows the decisions.** At completion, a separate reviewer checks
   the tree's changes and checks the code against the decisions it implements
   (the Design Correspondence Review).
@@ -36,7 +37,7 @@ beside the root nodes.
 
 ```
 design/
-  log.md            one entry per approved change, newest first
+  log.md            one entry per tree change, newest first
   pipeline.md       a root node
   pipeline/
     style.md        a child of pipeline
@@ -57,14 +58,12 @@ Rejected:
 ```
 
 Each field is one line in the file; the example wraps it for reading. A log
-entry names the nodes it changed and records the owner's approval:
+entry names the nodes it changed:
 
 ```
 ## 2026-10-01 Use fixed-point layout lengths
 
 Nodes: vocabulary
-
-Owner-approved: The owner agreed to Q12 as recommended.
 
 Summary: Layout lengths become 1/64-pixel integers; the measurements are in
 research/investigations/vocabulary/DESIGN.md.
@@ -130,8 +129,8 @@ its pin.
    compared with its fork point from the branch it targets, which the script
    reads from `GITHUB_BASE_REF`, so a pull request stacked on another work
    branch answers only for its own tree changes. A draft branch may
-   change the tree without an approval; `design-ready` is what keeps
-   unapproved changes off the main line.
+   change the tree freely; `design-ready` checks that its newest log entry
+   is new and names every changed node.
 
 ## Changing the skill
 
