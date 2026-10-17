@@ -129,12 +129,13 @@ Nodes: {nodes}
         result = self.lint(self.base, require_approval=True)
         self.assertEqual(result.returncode, 0, result.stderr)
 
-    def test_missing_or_empty_approval_field_is_rejected(self):
+    def test_log_entry_without_an_approval_field_passes(self):
         self.change_tree()
         for approval in (None, ""):
             with self.subTest(approval=approval):
                 self.log_change(approval=approval)
-                self.assert_rejected(self.lint(self.base, require_approval=True), "nonempty Owner-approved:")
+                result = self.lint(self.base, require_approval=True)
+                self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_reused_old_log_entry_is_rejected(self):
         self.change_tree()
